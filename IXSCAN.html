@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IXSCAN Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 100%;
+            justify-content: center;
+        }
+        .card {
+            width: 40px;
+            height: 60px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            position: relative;
+            transition: transform 0.3s;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        .card.flip {
+            transform: rotateY(180deg);
+        }
+        .card .front, .card .back {
+            position: absolute;
+            backface-visibility: hidden;
+        }
+        .card .back {
+            transform: rotateY(180deg);
+        }
+        #message {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Binary Search Visualization</h1>
+<p>Click on the cards to reveal their values and find the target.</p>
+<p>Target: <span id="targetValue"></span></p>
+<div class="card-container" id="cardContainer"></div>
+<div id="message"></div>
+<a href="index.html">Back to Index</a>
+
+<script>
+    // Generate a sorted array of 64 random integers between 100 and 1000
+    function generateRandomArray(length, min, max) {
+        const arr = Array.from({ length }, () => Math.floor(Math.random() * (max - min + 1)) + min);
+        return arr.sort((a, b) => a - b);
+    }
+
+    // Generate a random integer for the target
+    function generateRandomTargetFromArray(array, min, max) {
+        const inArray = Math.random() < 0.7; // 70% chance
+        if (inArray) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    const sortedArray = generateRandomArray(150, 100, 1000);
+    const target = generateRandomTargetFromArray(sortedArray, 1, 1500);
+    document.getElementById('targetValue').textContent = target;
+
+    let low = 0;
+    let high = sortedArray.length - 1;
+    let found = false;
+
+    const cardContainer = document.getElementById('cardContainer');
+    const message = document.getElementById('message');
+
+    // Create cards
+    sortedArray.forEach((value, index) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.innerHTML = `<div class="front">?</div><div class="back">${value}</div>`;
+        card.dataset.index = index;
+        cardContainer.appendChild(card);
+
+        card.addEventListener('click', () => flipCard(card, value));
+    });
+
+    function flipCard(card, value) {
+        if (found || card.classList.contains('flip')) return;
+        card.classList.add('flip');
+
+        const index = parseInt(card.dataset.index);
+
+        // Perform binary search step
+        if (value === target) {
+            found = true;
+            message.textContent = `Target found at index ${index}!`;
+            highlightCard(card, true);
+        } else if (value < target) {
+            low = index + 1;
+            message.textContent = `Searching in higher half...`;
+        } else {
+            high = index - 1;
+            message.textContent = `Searching in lower half...`;
+        }
+
+        // Highlight the card being examined
+        highlightCard(card, false);
+    }
+
+    function highlightCard(card, isTarget) {
+        if (isTarget) {
+            card.style.backgroundColor = '#8fbc8f'; // green for found
+        } else {
+            card.style.backgroundColor = '#f08080'; // light red for examined
+        }
+    }
+</script>
+
+</body>
+</html>
