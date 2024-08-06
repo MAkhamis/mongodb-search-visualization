@@ -1,5 +1,6 @@
 // lookup index
 // aagrgegation optimizer
+// shell impacting queries
 
 db.getCollection("cities").aggregate([
 
