@@ -1,4 +1,6 @@
 // prefix index
+// sort index
+// range index
 db.getCollection("cities").aggregate([
     { $sort: { name: 1, subcountry: 1 } },
     {
