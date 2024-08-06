@@ -1,4 +1,6 @@
 // lookup index
+// aagrgegation optimizer
+
 db.getCollection("cities").aggregate([
 
     {
